@@ -1,0 +1,155 @@
+import { useEffect, useRef } from "react";
+
+export default function App() {
+  const canvasRef = useRef(null);
+
+ useEffect(() => {
+  const canvas = canvasRef.current;
+  const ctx = canvas.getContext("2d");
+
+  let w = (canvas.width = window.innerWidth);
+  let h = (canvas.height = window.innerHeight);
+
+  window.onresize = () => {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  };
+
+  const particles = [];
+  const COUNT = 360;
+
+  function spawn() {
+    return {
+      x: Math.random() * w,
+      y: Math.random() * h,
+      z: Math.random() * 1400 + 100,
+      size: Math.random() * 3 + 1,
+      hue: Math.random() * 40 + 180, // blue → teal range
+      alpha: Math.random() * 0.55 + 0.3,
+    };
+  }
+
+  for (let i = 0; i < COUNT; i++) particles.push(spawn());
+
+  let t = 0;
+
+  function noise(x, y, t) {
+    return (
+      Math.sin(x * 0.001 + t * 0.4) +
+      Math.cos(y * 0.001 - t * 0.3)
+    ) * 0.5;
+  }
+
+  function draw() {
+    t += 0.004;
+
+    // Background gradient with slight tint
+    const bg = ctx.createLinearGradient(0, 0, w, h);
+    bg.addColorStop(0, "#f3f7ff");
+    bg.addColorStop(1, "#e7f7ff");
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, w, h);
+
+    // Ambient aurora glow
+    ctx.save();
+    ctx.filter = "blur(140px)";
+    ctx.fillStyle = "rgba(147, 197, 253, 0.35)"; // #93c5fd (light blue glow)
+    ctx.fillRect(0, 0, w, h);
+    ctx.restore();
+
+    particles.forEach((p) => {
+      const n = noise(p.x, p.y, t);
+      p.x += n * 0.7;
+      p.y += n * 0.7;
+      p.z -= 2.2;
+
+      if (p.z < 60) Object.assign(p, spawn(), { z: 1600 });
+
+      const scale = 600 / p.z;
+      const x = (p.x - w / 2) * scale + w / 2;
+      const y = (p.y - h / 2) * scale + h / 2;
+      const size = p.size * scale * 1.7;
+
+      const flicker = Math.random() < 0.0004 ? 0.6 : 0;
+
+      ctx.beginPath();
+      ctx.fillStyle = `hsla(${p.hue}, 90%, 75%, ${(p.alpha + flicker) * scale})`;
+      ctx.shadowBlur = 26 * (scale * 2);
+      ctx.shadowColor = `hsla(${p.hue}, 90%, 70%, .8)`;
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+
+  draw();
+}, []);
+
+  return (
+    <>
+      <canvas ref={canvasRef} style={styles.canvas} />
+
+      <div style={styles.card}>
+        <h2 style={styles.title}>Welcome to BuildBuddy</h2>
+        <p style={styles.subtitle}>Where ideas dissolve into possibility.</p>
+
+        <input style={styles.input} placeholder="Email" />
+        <input style={styles.input} type="password" placeholder="Password" />
+        <button style={styles.button}>Log In</button>
+      </div>
+    </>
+  );
+}
+
+const styles = {
+  canvas: {
+    position: "fixed",
+    inset: 0,
+    zIndex: "-1",
+    background: "#f2f7ff",
+  },
+  card: {
+    width: "390px",
+    padding: "45px",
+    margin: "14vh auto",
+    borderRadius: "24px",
+    background: "rgba(255,255,255,0.7)",
+    backdropFilter: "blur(25px)",
+    border: "1px solid rgba(255,255,255,0.5)",
+    boxShadow: "0 25px 70px rgba(0,0,0,0.08)",
+    textAlign: "center",
+  },
+  title: {
+    fontSize: "28px",
+    fontWeight: 600,
+    color: "#0f172a",
+    marginBottom: "6px",
+  },
+  subtitle: {
+    fontSize: "14px",
+    color: "#475569",
+    opacity: 0.7,
+    marginBottom: "24px",
+  },
+  input: {
+    width: "100%",
+    padding: "14px",
+    borderRadius: "10px",
+    border: "1px solid #dee3ec",
+    marginBottom: "12px",
+    fontSize: "15px",
+    background: "rgba(255,255,255,0.9)",
+  },
+  button: {
+    width: "100%",
+    padding: "13px",
+    borderRadius: "12px",
+    border: "none",
+    background: "linear-gradient(90deg,#3b82f6,#8b5cf6)",
+    color: "white",
+    fontWeight: 600,
+    fontSize: "15px",
+    cursor: "pointer",
+  },
+};
