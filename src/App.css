@@ -24,6 +24,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: #f3f7fb;
 }
 
 #root {
@@ -31,14 +32,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
+  width: 100vw;
 }
 
 .app-container {
-  width: 100%;
-  max-width: 440px;
-  animation: fadeIn 0.5s ease-in;
+  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto; /* ENABLE SCROLL */
+  padding: 24px 0;
 }
 
 @keyframes fadeIn {
@@ -52,6 +58,17 @@ body {
   }
 }
 
+.bubbles-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 0;
+  pointer-events: none;
+  background: transparent;
+}
+
+/* Card styles */
 .auth-card {
   background: var(--card-bg);
   border-radius: 20px;
@@ -59,15 +76,19 @@ body {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;     /* FIX FOR TALL CONTENT */
+  z-index: 1;
+  max-width: 440px;
+  width: 100%;
+  margin: 0 auto;
+  max-height: 95vh;     /* PREVENT OVERFLOW */
+  box-sizing: border-box;
 }
 
 .auth-card::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   height: 4px;
   background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
 }
@@ -78,23 +99,17 @@ body {
 }
 
 .logo {
-  width: 64px;
-  height: 64px;
+  width: 64px; height: 64px;
   margin: 0 auto 16px;
   background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
   border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  font-weight: bold;
-  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 32px; font-weight: bold; color: white;
   box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
 }
 
 .app-title {
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 28px; font-weight: 700;
   color: var(--text-dark);
   margin-bottom: 8px;
 }
@@ -208,25 +223,17 @@ body {
 }
 
 @media (max-width: 480px) {
+  .app-container {
+    padding: 12px 0 !important;
+  }
   .auth-card {
-    padding: 32px 24px;
+    padding: 32px 16px;
+    margin: 30px 0;
+    max-height: 100vh;
+    overflow-y: auto;
   }
-  
-  .app-title {
-    font-size: 24px;
-  }
-  
-  .logo {
-    width: 56px;
-    height: 56px;
-    font-size: 28px;
-  }
-  
-  .form-input {
-    padding: 12px 14px;
-  }
-  
-  .submit-button {
-    padding: 12px;
-  }
+  .app-title { font-size: 24px; }
+  .logo { width: 56px; height: 56px; font-size: 28px; }
+  .form-input { padding: 12px 14px; }
+  .submit-button { padding: 12px; }
 }
